@@ -1,235 +1,211 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" data-theme="light">
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>پنل مدیریت — BandW</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400&family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg: #f5f5f0; --fg: #0a0a0a; --gray: #888; --header-bg: #0a0a0a; --header-fg: #f5f5f0; --header-h: 56px; }
-    html, body { min-height: 100%; background: var(--bg); color: var(--fg); font-family: 'Vazirmatn', sans-serif; font-weight: 300; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت — BandW</title>
+    <style>
+        :root{--bg:#000;--text:#e0e0e0;--text-dim:#888;--line-divider:rgba(255,255,255,0.10);--font-mono:'SF Mono','Cascadia Code','Consolas',monospace;--font-sans:'Inter','Segoe UI',system-ui,sans-serif;--rule-height:32px;--header-height:56px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        html,body{min-height:100%;background:var(--bg);font-family:var(--font-mono);color:var(--text);-webkit-font-smoothing:antialiased;}
 
-    /* LOGIN */
-    .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 32px; }
-    .login-box { width: 100%; max-width: 360px; }
-    .login-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; }
-    .login-sub { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gray); letter-spacing: 2px; margin-bottom: 40px; }
-    .login-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 10px; }
-    .login-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--fg); padding: 10px 0; font-family: 'Vazirmatn', sans-serif; font-size: 16px; color: var(--fg); outline: none; margin-bottom: 32px; }
-    .login-btn { width: 100%; background: var(--fg); color: var(--bg); border: none; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 3px; cursor: pointer; transition: opacity 0.2s; }
-    .login-btn:hover { opacity: 0.8; }
-    .login-error { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #c00; margin-top: 16px; letter-spacing: 1px; display: none; }
+        /* LOGIN */
+        .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px;}
+        .login-box{width:100%;max-width:340px;}
+        .login-title{font-family:var(--font-sans);font-size:2rem;font-weight:700;letter-spacing:0.08em;color:#fff;text-transform:uppercase;margin-bottom:4px;}
+        .login-sub{font-size:0.6rem;letter-spacing:0.1em;color:var(--text-dim);opacity:0.5;margin-bottom:48px;}
+        .login-label{display:block;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;opacity:0.7;}
+        .login-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.2);padding:10px 0;font-family:var(--font-mono);font-size:1rem;color:#fff;outline:none;margin-bottom:32px;transition:border-color 0.2s;}
+        .login-input:focus{border-bottom-color:rgba(255,255,255,0.6);}
+        .login-btn{width:100%;background:#fff;color:#000;border:none;padding:14px;font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;}
+        .login-btn:hover{opacity:0.85;}
+        .login-error{font-size:0.65rem;color:#ff9090;margin-top:16px;letter-spacing:0.04em;display:none;}
 
-    /* ADMIN PANEL */
-    .admin-screen { display: none; }
-    header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: var(--header-bg); color: var(--header-fg); display: flex; align-items: center; padding: 0 32px; z-index: 100; border-bottom: 2px solid var(--header-fg); gap: 16px; }
-    .site-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; color: var(--header-fg); text-decoration: none; }
-    .admin-badge { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 2px; background: var(--header-fg); color: var(--header-bg); padding: 2px 7px; }
-    .logout-btn { margin-right: auto; background: none; border: 1px solid rgba(245,245,240,0.3); color: var(--header-fg); font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; padding: 4px 10px; cursor: pointer; opacity: 0.6; transition: opacity 0.15s; }
-    .logout-btn:hover { opacity: 1; }
+        /* ADMIN */
+        .admin-screen{display:none;}
+        .header{height:var(--header-height);display:flex;align-items:center;padding:0 28px;background:#000;border-bottom:1px solid var(--line-divider);gap:12px;position:sticky;top:0;z-index:100;}
+        .header-title{font-family:var(--font-sans);font-size:1.1rem;font-weight:700;letter-spacing:0.08em;color:#fff;text-transform:uppercase;text-decoration:none;}
+        .admin-badge{font-size:0.55rem;letter-spacing:0.08em;background:#fff;color:#000;padding:2px 7px;}
+        .logout-btn{margin-right:auto;background:none;border:1px solid rgba(255,255,255,0.2);color:var(--text-dim);font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.06em;padding:5px 12px;cursor:pointer;transition:all 0.15s;}
+        .logout-btn:hover{border-color:rgba(255,255,255,0.5);color:#fff;}
 
-    .tabs { position: fixed; top: var(--header-h); left: 0; right: 0; display: flex; border-bottom: 1px solid var(--fg); background: var(--bg); z-index: 99; }
-    .tab-btn { flex: 1; padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; background: none; border: none; border-right: 1px solid var(--fg); cursor: pointer; color: var(--gray); transition: background 0.15s, color 0.15s; }
-    .tab-btn:last-child { border-right: none; }
-    .tab-btn.active { background: var(--fg); color: var(--bg); }
-    .tab-count { font-size: 8px; opacity: 0.7; margin-right: 6px; }
+        .tabs{display:flex;border-bottom:1px solid var(--line-divider);position:sticky;top:var(--header-height);background:#000;z-index:99;}
+        .tab-btn{flex:1;padding:14px;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;background:none;border:none;border-left:1px solid var(--line-divider);cursor:pointer;color:var(--text-dim);transition:color 0.15s,background 0.15s;}
+        .tab-btn:first-child{border-left:none;}
+        .tab-btn.active{color:#fff;background:rgba(255,255,255,0.04);}
+        .tab-btn.active::after{content:'';display:block;width:18px;height:1px;background:#fff;margin:4px auto 0;}
+        .tab-count{font-size:0.55rem;opacity:0.5;margin-right:4px;}
 
-    .content { padding-top: calc(var(--header-h) + 49px); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+        .tab-panel{display:none;padding:0 28px;}
+        .tab-panel.active{display:block;}
 
-    .section-head { padding: 32px 40px 16px; border-bottom: 1px solid var(--fg); }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+        .post-card{padding:24px 0;border-bottom:1px solid var(--line-divider);}
+        .post-card:last-child{border-bottom:none;}
+        .post-card-title{font-family:var(--font-sans);font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:6px;line-height:1.4;}
+        .post-card-meta{font-size:0.6rem;letter-spacing:0.06em;color:var(--text-dim);opacity:0.6;margin-bottom:10px;}
+        .post-card-body{font-size:0.8rem;line-height:1.7;color:#888;margin-bottom:16px;max-height:64px;overflow:hidden;position:relative;}
+        .post-card-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(transparent,#000);}
+        .post-actions{display:flex;gap:8px;flex-wrap:wrap;}
+        .action-btn{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:6px 14px;border:1px solid rgba(255,255,255,0.2);background:none;color:var(--text-dim);cursor:pointer;transition:all 0.15s;}
+        .action-btn:hover{border-color:rgba(255,255,255,0.6);color:#fff;}
+        .action-btn.danger{border-color:rgba(255,80,80,0.3);color:#ff9090;}
+        .action-btn.danger:hover{border-color:#ff5050;background:rgba(255,80,80,0.1);}
+        .action-btn.publish{border-color:rgba(100,255,100,0.3);color:#90ff90;}
+        .action-btn.publish:hover{border-color:#50ff50;background:rgba(100,255,100,0.1);}
+        .action-btn.best-on{border-color:rgba(255,255,255,0.5);color:#fff;}
 
-    .post-card { border-bottom: 1px solid #ccc; padding: 28px 40px; }
-    .post-card-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; margin-bottom: 8px; }
-    .post-card-meta { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gray); letter-spacing: 1px; margin-bottom: 12px; }
-    .post-card-body { font-size: 13px; line-height: 1.7; color: #444; margin-bottom: 20px; max-height: 80px; overflow: hidden; position: relative; }
-    .post-card-body::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 24px; background: linear-gradient(transparent, var(--bg)); }
-    .post-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .action-btn { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 16px; border: 1px solid var(--fg); background: none; color: var(--fg); cursor: pointer; transition: background 0.15s, color 0.15s; }
-    .action-btn:hover { background: var(--fg); color: var(--bg); }
-    .action-btn.danger { border-color: #c00; color: #c00; }
-    .action-btn.danger:hover { background: #c00; color: #fff; }
-    .action-btn.success { border-color: #080; color: #080; }
-    .action-btn.success:hover { background: #080; color: #fff; }
-    .action-btn.toggle-best { border-color: #888; color: #888; }
-    .action-btn.toggle-best.on { border-color: var(--fg); color: var(--fg); font-weight: 700; }
+        /* CATEGORIES TAB */
+        .cat-list{padding:0;}
+        .cat-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line-divider);}
+        .cat-row:last-child{border-bottom:none;}
+        .cat-row-name{font-size:0.95rem;color:#e0e0e0;}
+        .add-cat-row{display:flex;gap:12px;padding:24px 0;border-bottom:1px solid var(--line-divider);margin-bottom:8px;}
+        .cat-input{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.2);padding:8px 0;font-family:var(--font-mono);font-size:0.9rem;color:#fff;outline:none;}
+        .cat-input:focus{border-bottom-color:rgba(255,255,255,0.6);}
+        .cat-add-btn{background:#fff;color:#000;border:none;padding:8px 20px;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;cursor:pointer;transition:opacity 0.15s;}
+        .cat-add-btn:hover{opacity:0.85;}
 
-    .empty-state { padding: 60px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gray); letter-spacing: 2px; }
-    .loading { padding: 60px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+        .empty-state{text-align:center;padding:60px 0;color:var(--text-dim);font-size:0.8rem;letter-spacing:0.06em;opacity:0.4;}
+        .loading-state{text-align:center;padding:60px 0;color:var(--text-dim);font-size:0.7rem;letter-spacing:0.1em;opacity:0.3;}
 
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 12px 24px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-    .toast.show { opacity: 1; }
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.08em;padding:12px 24px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+        .toast.show{opacity:1;}
 
-    @media (max-width: 480px) {
-      header { padding: 0 16px; }
-      .post-card { padding: 20px 16px; }
-      .section-head { padding: 20px 16px 12px; }
-      .tab-btn { font-size: 8px; padding: 12px 6px; }
-    }
-  </style>
+        @media(max-width:520px){.header{padding:0 16px;}.tab-panel{padding:0 16px;}.post-card{padding:20px 0;}.tab-btn{font-size:0.55rem;padding:12px 6px;}}
+    </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
-  <div class="login-box">
-    <div class="login-title">BandW</div>
-    <div class="login-sub">— پنل مدیریت —</div>
-    <label class="login-label">رمز عبور</label>
-    <input type="password" class="login-input" id="password-input" placeholder="رمز عبور را وارد کنید" onkeydown="if(event.key==='Enter') login()" />
-    <button class="login-btn" onclick="login()">ورود به پنل</button>
-    <div class="login-error" id="login-error">رمز عبور اشتباه است.</div>
-  </div>
+    <div class="login-box">
+        <div class="login-title">BandW</div>
+        <div class="login-sub">— admin panel —</div>
+        <label class="login-label">رمز عبور</label>
+        <input type="password" class="login-input" id="password-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()" />
+        <button class="login-btn" onclick="login()">ورود</button>
+        <div class="login-error" id="login-error">رمز عبور اشتباه است.</div>
+    </div>
 </div>
 
-<!-- ADMIN -->
 <div class="admin-screen" id="admin-screen">
-  <header>
-    <a href="index.html" class="site-name">BandW</a>
-    <span class="admin-badge">ADMIN</span>
-    <button class="logout-btn" onclick="logout()">خروج</button>
-  </header>
-
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending')">
-      در انتظار <span class="tab-count" id="count-pending"></span>
-    </button>
-    <button class="tab-btn" id="tab-published" onclick="switchTab('published')">
-      منتشرشده <span class="tab-count" id="count-published"></span>
-    </button>
-  </div>
-
-  <div class="content">
-    <div class="tab-panel active" id="panel-pending">
-      <div class="section-head"><div class="section-title">پست‌های در انتظار تایید</div></div>
-      <div id="list-pending"><div class="loading">در حال بارگذاری...</div></div>
+    <header class="header">
+        <a href="index.html" class="header-title">BandW</a>
+        <span class="admin-badge">ADMIN</span>
+        <button class="logout-btn" onclick="logout()">خروج</button>
+    </header>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('pending')">در انتظار <span class="tab-count" id="count-pending"></span></button>
+        <button class="tab-btn" onclick="switchTab('published')">منتشرشده <span class="tab-count" id="count-published"></span></button>
+        <button class="tab-btn" onclick="switchTab('categories')">کتگوری‌ها</button>
     </div>
-    <div class="tab-panel" id="panel-published">
-      <div class="section-head"><div class="section-title">پست‌های منتشرشده</div></div>
-      <div id="list-published"><div class="loading">در حال بارگذاری...</div></div>
-    </div>
-  </div>
+    <div class="tab-panel active" id="panel-pending"><div class="loading-state">loading...</div></div>
+    <div class="tab-panel" id="panel-published"><div class="loading-state">loading...</div></div>
+    <div class="tab-panel" id="panel-categories"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const SUPABASE_URL = 'https://hngeorydusjxqaceojmj.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.UnSr8T95PIrJSroAD0xlvh48DXeqX03HGQAanHh1M0c';
-  const ADMIN_PASS = 'bandw2024';
+const SUPABASE_URL = 'https://hngeorydusjxqaceojmj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.UnSr8T95PIrJSroAD0xlvh48DXeqX03HGQAanHh1M0c';
+const ADMIN_PASS = 'bandw2024';
+const h = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-  function login() {
-    const pass = document.getElementById('password-input').value;
-    if (pass === ADMIN_PASS) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('admin-screen').style.display = 'block';
-      loadAll();
-    } else {
-      document.getElementById('login-error').style.display = 'block';
-    }
-  }
+function login() {
+    if (document.getElementById('password-input').value === ADMIN_PASS) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        loadAll();
+    } else { document.getElementById('login-error').style.display = 'block'; }
+}
+function logout() { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('admin-screen').style.display = 'none'; document.getElementById('password-input').value = ''; }
 
-  function logout() {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('admin-screen').style.display = 'none';
-    document.getElementById('password-input').value = '';
-  }
-
-  function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['pending','published','categories'][i] === tab));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
-  }
+    if (tab === 'categories') loadCategories();
+}
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
 
-  async function api(method, id, data) {
-    const url = id ? `${SUPABASE_URL}/rest/v1/posts?id=eq.${id}` : `${SUPABASE_URL}/rest/v1/posts`;
-    const res = await fetch(url, {
-      method,
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal'
-      },
-      body: data ? JSON.stringify(data) : undefined
-    });
-    return res;
-  }
+async function api(method, table, id, data) {
+    const url = id ? `${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}` : `${SUPABASE_URL}/rest/v1/${table}`;
+    return fetch(url, { method, headers: { ...h, Prefer: 'return=minimal' }, body: data ? JSON.stringify(data) : undefined });
+}
 
-  async function loadAll() {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/posts?order=created_at.desc`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-    });
-    const posts = await res.json();
-
+async function loadAll() {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/posts?order=created_at.desc`, { headers: h });
+    const posts = await r.json();
     const pending = posts.filter(p => p.status === 'pending');
     const published = posts.filter(p => p.status === 'published');
-
     document.getElementById('count-pending').textContent = `(${pending.length})`;
     document.getElementById('count-published').textContent = `(${published.length})`;
+    renderPosts('panel-pending', pending, 'pending');
+    renderPosts('panel-published', published, 'published');
+}
 
-    renderList('list-pending', pending, 'pending');
-    renderList('list-published', published, 'published');
-  }
-
-  function renderList(elId, posts, type) {
+function renderPosts(elId, posts, type) {
     const el = document.getElementById(elId);
-    if (!posts.length) { el.innerHTML = '<div class="empty-state">پستی یافت نشد.</div>'; return; }
+    if (!posts.length) { el.innerHTML = '<div class="empty-state">پستی یافت نشد</div>'; return; }
     el.innerHTML = '';
     posts.forEach(post => {
-      const date = new Date(post.created_at).toLocaleDateString('fa-IR');
-      const div = document.createElement('div');
-      div.className = 'post-card';
-      div.id = 'card-' + post.id;
-      div.innerHTML = `
-        <div class="post-card-title">${post.title}</div>
-        <div class="post-card-meta">${post.category}  ·  ${date}</div>
-        <div class="post-card-body">${post.body}</div>
-        <div class="post-actions">
-          ${type === 'pending' ? `<button class="action-btn success" onclick="publish('${post.id}')">✓ انتشار</button>` : ''}
-          ${type === 'published' ? `<button class="action-btn toggle-best ${post.is_best ? 'on' : ''}" onclick="toggleBest('${post.id}', ${post.is_best})" id="best-btn-${post.id}">${post.is_best ? '★ برگزیده' : '☆ برگزیده'}</button>` : ''}
-          ${type === 'published' ? `<button class="action-btn" onclick="unpublish('${post.id}')">↩ لغو انتشار</button>` : ''}
-          <button class="action-btn danger" onclick="deletePost('${post.id}')">✕ حذف</button>
-        </div>`;
-      el.appendChild(div);
+        const date = new Date(post.created_at).toLocaleDateString('fa-IR');
+        const div = document.createElement('div');
+        div.className = 'post-card';
+        div.innerHTML = `
+            <div class="post-card-title">${post.title}</div>
+            <div class="post-card-meta">${post.category} · ${date}</div>
+            <div class="post-card-body">${post.body}</div>
+            <div class="post-actions">
+                ${type === 'pending' ? `<button class="action-btn publish" onclick="publish('${post.id}')">✓ انتشار</button>` : ''}
+                ${type === 'published' ? `<button class="action-btn ${post.is_best ? 'best-on' : ''}" onclick="toggleBest('${post.id}',${post.is_best})">${post.is_best ? '★ برگزیده' : '☆ برگزیده'}</button>` : ''}
+                ${type === 'published' ? `<button class="action-btn" onclick="unpublish('${post.id}')">↩ لغو</button>` : ''}
+                <button class="action-btn danger" onclick="deletePost('${post.id}')">✕ حذف</button>
+            </div>`;
+        el.appendChild(div);
     });
-  }
+}
 
-  async function publish(id) {
-    await api('PATCH', id, { status: 'published' });
-    showToast('پست منتشر شد ✓');
-    loadAll();
-  }
+async function publish(id) { await api('PATCH','posts',id,{status:'published'}); showToast('منتشر شد ✓'); loadAll(); }
+async function unpublish(id) { await api('PATCH','posts',id,{status:'pending'}); showToast('لغو انتشار شد'); loadAll(); }
+async function toggleBest(id, cur) { await api('PATCH','posts',id,{is_best:!cur}); showToast(!cur ? '★ به برگزیده‌ها اضافه شد' : 'از برگزیده‌ها حذف شد'); loadAll(); }
+async function deletePost(id) { if (!confirm('حذف شود؟')) return; await api('DELETE','posts',id); showToast('حذف شد'); loadAll(); }
 
-  async function unpublish(id) {
-    await api('PATCH', id, { status: 'pending' });
-    showToast('انتشار لغو شد');
-    loadAll();
-  }
+async function loadCategories() {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/categories?order=name.asc`, { headers: h });
+    const cats = await r.json();
+    const el = document.getElementById('panel-categories');
+    el.innerHTML = `
+        <div class="add-cat-row">
+            <input type="text" class="cat-input" id="new-cat" placeholder="نام کتگوری جدید..." />
+            <button class="cat-add-btn" onclick="addCategory()">اضافه کن</button>
+        </div>
+        <div class="cat-list" id="cat-list"></div>`;
+    const list = document.getElementById('cat-list');
+    if (!cats.length) { list.innerHTML = '<div class="empty-state">کتگوری‌ای یافت نشد</div>'; return; }
+    cats.forEach(cat => {
+        const d = document.createElement('div');
+        d.className = 'cat-row';
+        d.innerHTML = `<span class="cat-row-name">${cat.name}</span><button class="action-btn danger" onclick="deleteCategory('${cat.id}','${cat.name}')">✕ حذف</button>`;
+        list.appendChild(d);
+    });
+}
 
-  async function toggleBest(id, current) {
-    await api('PATCH', id, { is_best: !current });
-    showToast(!current ? 'به برگزیده‌ها اضافه شد ★' : 'از برگزیده‌ها حذف شد');
-    loadAll();
-  }
+async function addCategory() {
+    const name = document.getElementById('new-cat').value.trim();
+    if (!name) return;
+    await api('POST','categories',null,{name});
+    showToast('کتگوری اضافه شد');
+    loadCategories();
+}
 
-  async function deletePost(id) {
-    if (!confirm('آیا مطمئنید؟ این عمل قابل بازگشت نیست.')) return;
-    await api('DELETE', id);
-    showToast('پست حذف شد');
-    loadAll();
-  }
+async function deleteCategory(id, name) {
+    if (!confirm(`کتگوری "${name}" حذف شود؟`)) return;
+    await api('DELETE','categories',id);
+    showToast('کتگوری حذف شد');
+    loadCategories();
+}
 </script>
 </body>
 </html>
