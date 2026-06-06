@@ -66,7 +66,6 @@
             box-shadow: 0 0 80px rgba(0, 0, 0, 0.6);
         }
 
-        /* ── header ─────────────────────── */
         .header {
             flex: 0 0 var(--header-height);
             height: var(--header-height);
@@ -111,7 +110,6 @@
             font-family: var(--font-mono);
         }
 
-        /* ── content ────────────────────── */
         .content {
             flex: 1 1 auto;
             overflow-y: auto;
@@ -137,7 +135,6 @@
             border-radius: 3px;
         }
 
-        /* ── section label ─────────────── */
         .section-label {
             font-size: 0.6rem;
             letter-spacing: 0.14em;
@@ -150,7 +147,6 @@
             font-family: var(--font-mono);
         }
 
-        /* ── card base (list items, categories) ── */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -182,7 +178,6 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* ── list item specifics ──────── */
         .list-item-bullet {
             flex: 0 0 6px;
             width: 6px;
@@ -237,7 +232,6 @@
             opacity: 0.9;
         }
 
-        /* ── category card specifics ───── */
         .category-card-name {
             font-size: 0.95rem;
             letter-spacing: 0.04em;
@@ -261,7 +255,6 @@
             transform: translateX(0);
         }
 
-        /* ── article view ──────────────── */
         .article-view {
             animation: fadeIn 0.3s ease;
         }
@@ -318,7 +311,6 @@
             background: var(--text-dim);
         }
 
-        /* ── back row ──────────────────── */
         .back-row {
             display: inline-flex;
             align-items: center;
@@ -341,7 +333,6 @@
             transform: translateX(-4px);
         }
 
-        /* ── empty/loading states ──────── */
         .empty-state,
         .loading-state {
             text-align: center;
@@ -365,7 +356,6 @@
             }
         }
 
-        /* ── footer ────────────────────── */
         .footer {
             flex: 0 0 var(--footer-height);
             height: var(--footer-height);
@@ -418,7 +408,6 @@
             margin: 12px 0;
         }
 
-        /* ── responsive ────────────────── */
         @media (max-width: 560px) {
             :root {
                 --content-padding-x: 16px;
@@ -507,22 +496,48 @@
             if (filter.category) url += `&category=eq.${encodeURIComponent(filter.category)}`;
             if (filter.best) url += `&is_best=eq.true`;
             const r = await fetch(url, { headers });
+            if (!r.ok) throw new Error('Network response was not ok');
             return r.json();
         }
 
         const contentEl = document.getElementById('content');
-        let state = { tab: 'home', view: 'list', selectedCategory: null, posts: [], categories: [],
-            selectedArticle: null };
+        let state = {
+            tab: 'home',
+            view: 'list',
+            selectedCategory: null,
+            posts: [],
+            categories: [],
+            selectedArticle: null
+        };
+
+        // Escape HTML to prevent XSS
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
 
         async function init() {
-            const r = await fetch(`${SUPABASE_URL}/rest/v1/categories?order=name.asc`, { headers });
-            state.categories = await r.json();
-            state.posts = await getPosts();
+            try {
+                const r = await fetch(`${SUPABASE_URL}/rest/v1/categories?order=name.asc`, { headers });
+                state.categories = await r.json();
+            } catch (e) {
+                state.categories = [];
+            }
+            try {
+                state.posts = await getPosts();
+            } catch (e) {
+                state.posts = [];
+            }
             render();
         }
 
         function setTab(tab) {
-            if (tab === 'submit') { location.href = 'submit.html'; return; }
+            if (tab === 'submit') {
+                window.location.href = 'submit.html';
+                return;
+            }
             document.querySelectorAll('.footer-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + tab).classList.add('active');
             state.tab = tab;
@@ -537,7 +552,11 @@
 
         async function loadAndRender(filter = {}) {
             contentEl.innerHTML = `<div class="loading-state">در حال بارگذاری...</div>`;
-            state.posts = await getPosts(filter);
+            try {
+                state.posts = await getPosts(filter);
+            } catch (e) {
+                state.posts = [];
+            }
             render();
         }
 
@@ -552,16 +571,27 @@
 
         function renderList() {
             const label = state.tab === 'home' ? 'آخرین مطالب منتشر شده' : 'منتخب سردبیر';
-            contentEl.innerHTML = `<div class="section-label">${label}</div>`;
+            const section = document.createElement('div');
+            section.className = 'section-label';
+            section.textContent = label;
+            contentEl.appendChild(section);
+
             if (!state.posts.length) {
-                contentEl.innerHTML += `<div class="empty-state">مطلبی یافت نشد</div>`;
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.textContent = 'مطلبی یافت نشد';
+                contentEl.appendChild(empty);
                 return;
             }
+
             state.posts.forEach(p => {
                 const d = document.createElement('div');
                 d.className = 'card list-item' + (p.is_best ? ' best' : '');
-                d.innerHTML =
-                    `<span class="list-item-bullet"></span><span class="list-item-title">${p.title}</span><span class="list-item-cat-tag">${p.category || ''}</span>`;
+                d.innerHTML = `
+                    <span class="list-item-bullet"></span>
+                    <span class="list-item-title">${escapeHTML(p.title)}</span>
+                    <span class="list-item-cat-tag">${escapeHTML(p.category || '')}</span>
+                `;
                 d.addEventListener('click', () => {
                     state.selectedArticle = p;
                     state.view = 'article';
@@ -572,17 +602,10 @@
         }
 
         function renderCategories() {
-            contentEl.innerHTML = `<div class="section-label">دسته‌بندی‌ها</div>`;
-            state.categories.forEach(cat => {
-                const d = document.createElement('div');
-                d.className = 'card category-card';
-                d.innerHTML =
-                    `<span class="category-card-name">${cat.name}</span><span class="category-card-arrow">←</span>`;
-                d.addEventListener('click', async () => {
-                    state.selectedCategory = cat.name;
-                    state.view = 'catposts';
-                    contentEl.innerHTML = `<div class="loading-state">در حال بارگذاری...</div>`;
-                    state.posts = await getPosts({ category: cat.name });
-                    render();
-                });
-          
+            const section = document.createElement('div');
+            section.className = 'section-label';
+            section.textContent = 'دسته‌بندی‌ها';
+            contentEl.appendChild(section);
+
+            if (!state.categories.length) {
+   
