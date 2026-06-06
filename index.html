@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandW</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@300;400&family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f5f0; --fg: #0a0a0a; --gray: #888; --border-color: #0a0a0a;
+      --header-bg: #0a0a0a; --header-fg: #f5f5f0;
+      --footer-bg: #f5f5f0; --footer-fg: #0a0a0a;
+      --hover-bg: #0a0a0a; --hover-fg: #f5f5f0;
+      --badge-bg: #0a0a0a; --badge-fg: #f5f5f0;
+      --header-h: 56px; --footer-h: 56px; --transition: 0.2s ease;
+    }
+    [data-theme="dark"] {
+      --bg: #0a0a0a; --fg: #f5f5f0; --gray: #666; --border-color: #f5f5f0;
+      --header-bg: #f5f5f0; --header-fg: #0a0a0a;
+      --footer-bg: #0a0a0a; --footer-fg: #f5f5f0;
+      --hover-bg: #f5f5f0; --hover-fg: #0a0a0a;
+      --badge-bg: #f5f5f0; --badge-fg: #0a0a0a;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--fg); font-family: 'Vazirmatn', sans-serif; font-weight: 300; transition: background var(--transition), color var(--transition); }
+    header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: var(--header-bg); color: var(--header-fg); display: flex; align-items: center; padding: 0 32px; z-index: 100; border-bottom: 2px solid var(--header-fg); transition: background var(--transition); }
+    .site-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; color: var(--header-fg); }
+    .site-tagline { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gray); margin-right: auto; letter-spacing: 2px; }
+    .mode-toggle { background: none; border: 1px solid var(--header-fg); color: var(--header-fg); font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 7px; opacity: 0.6; transition: opacity 0.15s; }
+    .mode-toggle:hover { opacity: 1; }
+    main { margin-top: var(--header-h); margin-bottom: var(--footer-h); min-height: calc(100vh - var(--header-h) - var(--footer-h)); }
+    .view { display: none; }
+    .view.active { display: block; }
+    .list-header { padding: 40px 40px 20px; border-bottom: 1px solid var(--border-color); }
+    .list-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+    .list-title { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--fg); }
+    .post-list { list-style: none; }
+    .post-item { border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background var(--transition), color var(--transition); }
+    .post-item:hover { background: var(--hover-bg); color: var(--hover-fg); }
+    .post-item:hover .post-meta, .post-item:hover .post-num { color: var(--gray); }
+    .post-item:hover .post-cat { color: var(--hover-fg); border-color: var(--hover-fg); }
+    .post-item:hover .best-badge { background: var(--hover-fg); color: var(--hover-bg); }
+    .post-inner { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 20px 40px; gap: 24px; }
+    .post-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gray); letter-spacing: 1px; margin-bottom: 4px; }
+    .post-heading { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; line-height: 1.4; margin-bottom: 4px; }
+    .post-meta { font-size: 11px; color: var(--gray); font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+    .post-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .post-cat { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--fg); color: var(--fg); padding: 3px 8px; transition: border-color var(--transition), color var(--transition); }
+    .post-arrow { font-size: 18px; opacity: 0.25; }
+    .best-badge { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 1px; background: var(--badge-bg); color: var(--badge-fg); padding: 2px 6px; vertical-align: middle; transition: background var(--transition), color var(--transition); }
+    .cat-grid { padding: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0; }
+    .cat-item { border: 1px solid var(--border-color); padding: 32px 28px; cursor: pointer; transition: background var(--transition), color var(--transition); margin: -1px 0 0 -1px; }
+    .cat-item:hover { background: var(--hover-bg); color: var(--hover-fg); }
+    .cat-item:hover .cat-count { color: var(--gray); }
+    .cat-name { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .cat-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gray); letter-spacing: 2px; }
+    .article-wrap { max-width: 680px; margin: 0 auto; padding: 60px 40px 80px; }
+    .article-back { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; color: var(--gray); display: inline-flex; align-items: center; gap: 6px; margin-bottom: 48px; border-bottom: 1px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .article-back:hover { color: var(--fg); border-color: var(--fg); }
+    .article-title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; line-height: 1.2; margin-bottom: 32px; color: var(--fg); }
+    .article-divider { width: 48px; height: 2px; background: var(--fg); margin-bottom: 32px; transition: background var(--transition); }
+    .article-body { font-size: 16px; line-height: 1.9; font-weight: 300; color: var(--fg); }
+    .article-body p { margin-bottom: 20px; }
+    .article-footer-cat { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--border-color); font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); }
+    footer { position: fixed; bottom: 0; left: 0; right: 0; height: var(--footer-h); background: var(--footer-bg); border-top: 2px solid var(--border-color); display: flex; z-index: 100; transition: background var(--transition), border-color var(--transition); }
+    .nav-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background: none; border: none; border-right: 1px solid var(--border-color); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--footer-fg); transition: background var(--transition), color var(--transition); }
+    .nav-btn:last-child { border-right: none; }
+    .nav-btn:hover, .nav-btn.active { background: var(--hover-bg); color: var(--hover-fg); }
+    .nav-icon { font-size: 14px; }
+    .cat-posts-wrap { padding: 0 40px 40px; }
+    .cat-back { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; color: var(--gray); padding: 24px 0; display: inline-block; border-bottom: 1px solid transparent; transition: color 0.15s, border-color 0.15s; }
+    .cat-back:hover { color: var(--fg); border-color: var(--fg); }
+    .loading { padding: 60px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+    .empty { padding: 60px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gray); letter-spacing: 2px; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--fg); }
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .site-tagline { display: none; }
+      .mode-toggle { padding: 5px 9px; gap: 5px; }
+      #toggle-label { display: none; }
+      .list-header { padding: 28px 20px 16px; }
+      .list-title { font-size: 28px; }
+      .post-inner { padding: 16px 20px; gap: 12px; }
+      .post-heading { font-size: 17px; }
+      .cat-grid { padding: 20px; grid-template-columns: 1fr 1fr; }
+      .cat-item { padding: 22px 18px; }
+      .article-wrap { padding: 40px 20px 60px; }
+      .article-title { font-size: 30px; }
+      .cat-posts-wrap { padding: 0 20px 40px; }
+      .nav-btn { font-size: 9px; letter-spacing: 2px; gap: 5px; }
+    }
+    @media (max-width: 480px) {
+      :root { --header-h: 50px; --footer-h: 52px; }
+      .site-name { font-size: 18px; letter-spacing: 4px; }
+      .list-header { padding: 22px 16px 14px; }
+      .list-title { font-size: 24px; }
+      .post-inner { padding: 14px 16px; gap: 10px; }
+      .post-heading { font-size: 15px; }
+      .post-cat { display: none; }
+      .cat-grid { padding: 16px; grid-template-columns: 1fr; }
+      .cat-item { padding: 20px 16px; }
+      .article-wrap { padding: 28px 16px 56px; }
+      .article-title { font-size: 24px; }
+      .article-body { font-size: 14px; line-height: 1.8; }
+      .article-back { margin-bottom: 28px; }
+      .cat-posts-wrap { padding: 0 16px 40px; }
+      .nav-btn { font-size: 8px; letter-spacing: 1px; flex-direction: column; gap: 3px; }
+      .nav-icon { font-size: 16px; }
+    }
+    @media (min-width: 1200px) {
+      .list-header { padding: 56px 64px 24px; }
+      .list-title { font-size: 48px; }
+      .post-inner { padding: 24px 64px; }
+      .post-heading { font-size: 22px; }
+      .cat-grid { padding: 48px 64px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+      .article-wrap { max-width: 760px; padding: 72px 40px 100px; }
+      .cat-posts-wrap { padding: 0 64px 64px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <span class="site-name">BandW</span>
+  <span class="site-tagline">— words only —</span>
+  <button class="mode-toggle" onclick="toggleMode()">
+    <span class="toggle-icon">◑</span>
+    <span id="toggle-label">Dark</span>
+  </button>
+</header>
+<main>
+  <div class="view active" id="view-home">
+    <div class="list-header">
+      <div class="list-label">آخرین نوشته‌ها</div>
+      <div class="list-title">Latest</div>
+    </div>
+    <div id="home-content"><div class="loading">در حال بارگذاری...</div></div>
+  </div>
+  <div class="view" id="view-category">
+    <div class="list-header">
+      <div class="list-label">دسته‌بندی‌ها</div>
+      <div class="list-title">Categories</div>
+    </div>
+    <div id="cat-content"></div>
+  </div>
+  <div class="view" id="view-best">
+    <div class="list-header">
+      <div class="list-label">انتخاب سردبیر</div>
+      <div class="list-title">Best</div>
+    </div>
+    <div id="best-content"><div class="loading">در حال بارگذاری...</div></div>
+  </div>
+  <div class="view" id="view-article">
+    <div class="article-wrap">
+      <span class="article-back" id="back-btn">← بازگشت</span>
+      <h1 class="article-title" id="art-title"></h1>
+      <div class="article-divider"></div>
+      <div class="article-body" id="art-body"></div>
+      <div class="article-footer-cat" id="art-cat"></div>
+    </div>
+  </div>
+</main>
+<footer>
+  <button class="nav-btn active" id="btn-home" onclick="showView('home')">
+    <span class="nav-icon">⌂</span> Home
+  </button>
+  <button class="nav-btn" id="btn-category" onclick="showView('category')">
+    <span class="nav-icon">◈</span> Category
+  </button>
+  <button class="nav-btn" id="btn-best" onclick="showView('best')">
+    <span class="nav-icon">★</span> Best
+  </button>
+  <button class="nav-btn" onclick="location.href='submit.html'">
+    <span class="nav-icon">✎</span> Submit
+  </button>
+</footer>
+<script>
+  const SUPABASE_URL = 'https://hngeorydusjxqaceojmj.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.UnSr8T95PIrJSroAD0xlvh48DXeqX03HGQAanHh1M0c';
+
+  async function fetchPosts(filter = {}) {
+    let url = `${SUPABASE_URL}/rest/v1/posts?status=eq.published&order=created_at.desc`;
+    if (filter.category) url += `&category=eq.${encodeURIComponent(filter.category)}`;
+    if (filter.best) url += `&is_best=eq.true`;
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+    return res.json();
+  }
+
+  let allPosts = [];
+  let previousView = 'home';
+  let isDark = false;
+
+  function toggleMode() {
+    isDark = !isDark;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.getElementById('toggle-label').textContent = isDark ? 'Light' : 'Dark';
+  }
+
+  function showView(name, data = null) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (name === 'article') {
+      openArticle(data);
+      document.getElementById('view-article').classList.add('active');
+    } else {
+      document.getElementById('view-' + name).classList.add('active');
+      document.getElementById('btn-' + name)?.classList.add('active');
+      previousView = name;
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function openArticle(post) {
+    document.getElementById('art-title').textContent = post.title;
+    document.getElementById('art-body').innerHTML = post.body.split('\n').map(p => p ? `<p>${p}</p>` : '').join('');
+    const date = new Date(post.created_at).toLocaleDateString('fa-IR');
+    document.getElementById('art-cat').textContent = '# ' + post.category + '  ·  ' + date;
+  }
+
+  function renderPostItem(post, index) {
+    const li = document.createElement('li');
+    li.className = 'post-item';
+    const date = new Date(post.created_at).toLocaleDateString('fa-IR');
+    li.innerHTML = `
+      <div class="post-inner">
+        <div>
+          <div class="post-num">${String(index + 1).padStart(2, '0')}</div>
+          <div class="post-heading">${post.title} ${post.is_best ? '<span class="best-badge">BEST</span>' : ''}</div>
+          <div class="post-meta">${date}</div>
+        </div>
+        <div class="post-right">
+          <span class="post-cat">${post.category}</span>
+          <span class="post-arrow">→</span>
+        </div>
+      </div>`;
+    li.addEventListener('click', () => { previousView = document.querySelector('.nav-btn.active')?.id.replace('btn-', '') || 'home'; showView('article', post); });
+    return li;
+  }
+
+  async function loadHome() {
+    const posts = await fetchPosts();
+    allPosts = posts;
+    const el = document.getElementById('home-content');
+    if (!posts.length) { el.innerHTML = '<div class="empty">هنوز پستی منتشر نشده.</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'post-list';
+    posts.forEach((p, i) => ul.appendChild(renderPostItem(p, i)));
+    el.innerHTML = '';
+    el.appendChild(ul);
+  }
+
+  async function loadBest() {
+    const posts = await fetchPosts({ best: true });
+    const el = document.getElementById('best-content');
+    if (!posts.length) { el.innerHTML = '<div class="empty">هنوز پست برگزیده‌ای نیست.</div>'; return; }
+    const ul = document.createElement('ul');
+    ul.className = 'post-list';
+    posts.forEach((p, i) => ul.appendChild(renderPostItem(p, i)));
+    el.innerHTML = '';
+    el.appendChild(ul);
+  }
+
+  function renderCats() {
+    const catContent = document.getElementById('cat-content');
+    catContent.innerHTML = '';
+    const cats = [...new Set(allPosts.map(p => p.category))];
+    if (!cats.length) { catContent.innerHTML = '<div class="empty">دسته‌بندی‌ای یافت نشد.</div>'; return; }
+    const grid = document.createElement('div');
+    grid.className = 'cat-grid';
+    cats.forEach(cat => {
+      const count = allPosts.filter(p => p.category === cat).length;
+      const div = document.createElement('div');
+      div.className = 'cat-item';
+      div.innerHTML = `<div class="cat-name">${cat}</div><div class="cat-count">${count} نوشته</div>`;
+      div.addEventListener('click', () => showCatPosts(cat));
+      grid.appendChild(div);
+    });
+    catContent.appendChild(grid);
+  }
+
+  function showCatPosts(cat) {
+    const catContent = document.getElementById('cat-content');
+    catContent.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'cat-posts-wrap';
+    const back = document.createElement('span');
+    back.className = 'cat-back';
+    back.textContent = '← همه دسته‌بندی‌ها';
+    back.addEventListener('click', () => renderCats());
+    wrap.appendChild(back);
+    const ul = document.createElement('ul');
+    ul.className = 'post-list';
+    allPosts.filter(p => p.category === cat).forEach((p, i) => ul.appendChild(renderPostItem(p, i)));
+    wrap.appendChild(ul);
+    catContent.appendChild(wrap);
+  }
+
+  document.getElementById('back-btn').addEventListener('click', () => showView(previousView));
+
+  loadHome().then(() => { renderCats(); });
+  loadBest();
+</script>
+</body>
+</html>
