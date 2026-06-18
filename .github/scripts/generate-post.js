@@ -18,7 +18,7 @@ async function run() {
       'X-Title': 'BandW Blog'
     },
     body: JSON.stringify({
-      model: 'deepseek/deepseek-r1:free',
+      model: 'deepseek/deepseek-chat-v3-0324:free',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1500
     })
