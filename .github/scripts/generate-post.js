@@ -1,4 +1,4 @@
-const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
+import fetch from 'node-fetch';
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -35,6 +35,52 @@ async function generatePost() {
       max_tokens: 1500
     })
   });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`OpenRouter error: ${err}`);
+  }
+
+  const data = await res.json();
+  const rawText = data.choices[0].message.content.trim();
+  const jsonText = rawText
+    .replace(/```json\n?|\n?```/g, '')
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .trim();
+  const post = JSON.parse(jsonText);
+
+  console.log(`Generated: ${post.title}`);
+
+  const supaRes = await fetch(`${SUPABASE_URL}/rest/v1/posts`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal'
+    },
+    body: JSON.stringify({
+      title: post.title,
+      body: post.body,
+      category: 'تکنولوژی',
+      status: 'published',
+      is_best: false,
+      view_count: 0
+    })
+  });
+
+  if (!supaRes.ok) {
+    const err = await supaRes.text();
+    throw new Error(`Supabase error: ${err}`);
+  }
+
+  console.log(`✓ Published: ${post.title}`);
+}
+
+generatePost().catch(err => {
+  console.error('Error:', err.message);
+  process.exit(1);
+});  });
 
   if (!res.ok) {
     const err = await res.text();
