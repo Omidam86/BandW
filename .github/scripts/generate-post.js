@@ -2,7 +2,20 @@ import fetch from 'node-fetch';
 const KEY = process.env.OPENROUTER_API_KEY;
 const DB_URL = process.env.SUPABASE_URL;
 const DB_KEY = process.env.SUPABASE_KEY;
-const prompt = `یک مقاله کامل فارسی درباره تکنولوژی بنویس. فقط JSON بده بدون هیچ توضیح اضافه: {"title":"عنوان مقاله","body":"پاراگراف اول\n\nپاراگراف دوم\n\nپاراگراف سوم"}`;
+const prompt = `تاریخ امروز: ${new Date().toLocaleDateString('fa-IR')}
+
+یکی از این موضوعات رو به صورت تصادفی انتخاب کن: تراشه‌های پردازنده، هوش مصنوعی، خودروهای برقی، سیستم‌عامل‌ها
+
+درباره یک خبر مشخص و واقعی از همین هفته در اون موضوع، یک مقاله خبری-تحلیلی فارسی بنویس.
+
+شرایط مقاله:
+- روی یک خبر یا رویداد مشخص تمرکز کن، نه کلی‌گویی
+- لحن جذاب، روان و خبری داشته باشد
+- دقیقاً ۶ پاراگراف، هر پاراگراف ۳ تا ۴ جمله
+- با جزئیات واقعی مثل نام شرکت، مدل محصول، عدد و آمار
+
+فقط JSON بده بدون هیچ توضیح اضافه:
+{"title":"عنوان خبری جذاب","body":"پاراگراف اول\n\nپاراگراف دوم\n\nپاراگراف سوم\n\nپاراگراف چهارم\n\nپاراگراف پنجم\n\nپاراگراف ششم"}`;
 async function run() {
   console.log('Calling OpenRouter...');
   const r1 = await fetch('https://openrouter.ai/api/v1/chat/completions', {
