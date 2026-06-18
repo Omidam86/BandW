@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: npm install node-fetch
+        run: npm install node-fetch && echo '{"type":"module"}' > package.json
       - name: Generate and publish post
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
