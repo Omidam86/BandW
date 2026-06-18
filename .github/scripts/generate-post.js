@@ -18,7 +18,7 @@ async function run() {
       'X-Title': 'BandW Blog'
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-3.3-70b-instruct:free',
+      model: 'deepseek/deepseek-chat-v3-0324',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1500
     })
