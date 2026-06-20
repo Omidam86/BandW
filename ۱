@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BandW — بلاگ سیاه و سفید</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#050508;
+  --surface:rgba(255,255,255,0.045);
+  --surface-hover:rgba(255,255,255,0.075);
+  --border:rgba(255,255,255,0.07);
+  --border-hover:rgba(255,255,255,0.2);
+  --text:#f4f4f8;
+  --text-sec:#9999bb;
+  --text-dim:#444458;
+  --accent:#7c7cff;
+  --accent-glow:rgba(124,124,255,0.2);
+  --radius:18px;
+  --radius-sm:10px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --header-h:62px;
+}
+
+html,body{
+  height:100%;background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 120% 70% at 50% -10%,rgba(100,80,220,0.15) 0%,transparent 60%),
+    radial-gradient(ellipse 80% 50% at 80% 100%,rgba(60,40,180,0.08) 0%,transparent 60%);
+  color:var(--text);
+  font-family:'Vazirmatn','Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+/* تغییر به حالت رسپانسیو و تمام صفحه در دسکتاپ */
+.app{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  width:100%;
+  max-width:1200px; /* نمایش عریض‌تر در کامپیوتر */
+  margin:0 auto;
+  border-left:1px solid var(--border);
+  border-right:1px solid var(--border);
+}
+
+@media(max-width:1200px) {
+  .app { max-width: 100%; border: none; }
+}
+
+/* ── SPLASH SCREEN ── */
+#splash{
+  position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 32px;
+  transition:opacity 0.5s var(--ease),visibility 0.5s;
+}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+.splash-logo{
+  font-family:'Inter',sans-serif;font-size:3rem;font-weight:900;
+  letter-spacing:0.1em;color:#fff;text-transform:uppercase;
+  margin-bottom:12px;
+  text-shadow:0 0 40px rgba(124,124,255,0.4);
+}
+.splash-tagline{
+  font-size:0.8rem;letter-spacing:0.2em;color:var(--text-dim);
+  text-transform:uppercase;margin-bottom:56px;
+}
+
+/* ── LOADER ── */
+#app-loading-screen{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  z-index:99998;transition:opacity 0.5s var(--ease),visibility 0.5s;
+}
+.loading-text-wrapper{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;direction:ltr;}
+.loading-text-wrapper .letter{opacity:0;transform:translateY(14px);filter:blur(6px);animation:introLetter 0.55s var(--ease) forwards;}
+#l-b{font-size:3.5rem;font-weight:900;color:#fff;animation-delay:0.2s;text-shadow:0 0 40px rgba(124,124,255,0.4);}
+#l-and{font-size:2rem;font-weight:300;color:var(--text-sec);animation-delay:0.65s;}
+#l-w{font-size:3.5rem;font-weight:900;color:#fff;animation-delay:1.1s;text-shadow:0 0 40px rgba(124,124,255,0.4);}
+@keyframes introLetter{to{opacity:1;transform:translateY(0);filter:blur(0);}}
+#app-loading-screen.loaded{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* ── HEADER ── */
+.header{
+  flex:0 0 var(--header-h);
+  display:flex;align-items:center;padding:0 20px;
+  background:rgba(5,5,8,0.85);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:50;gap:12px;
+}
+.menu-btn{
+  width:40px;height:40px;border-radius:var(--radius-sm);
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.05rem;color:var(--text-sec);
+  transition:all 0.2s var(--ease);flex-shrink:0;
+}
+.menu-btn:hover{background:var(--surface-hover);border-color:var(--border-hover);color:var(--text);}
+.header-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.header-name{
+  font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:900;
+  letter-spacing:0.2em;color:#fff;text-transform:uppercase;
+}
+.header-tag{font-size:0.42rem;letter-spacing:0.22em;color:var(--text-dim);text-transform:uppercase;}
+
+/* ── CONTENT & SCROLLBAR ── */
+.content{
+  flex:1 1 auto;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;padding:24px 20px 40px;
+  scroll-behavior:smooth;
+}
+/* ایجاد اسکرول بار زیبا برای کامپیوتر و گوشی */
+.content::-webkit-scrollbar{width:6px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px;transition:background 0.2s;}
+.content::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+.section-label{
+  font-size:0.55rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:18px;padding:0 2px;
+  display:flex;align-items:center;gap:12px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.post-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 22px;margin-bottom:12px;cursor:pointer;
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+  transition:all 0.2s var(--ease);position:relative;overflow:hidden;
+}
+.post-card:hover{
+  background:var(--surface-hover);border-color:var(--border-hover);transform:translateY(-2px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);
+}
+
+.card-title{font-size:0.98rem;font-weight:600;color:var(--text);line-height:1.55;margin-bottom:10px;}
+.card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.card-cat{
+  font-size:0.6rem;letter-spacing:0.07em;color:var(--text-sec);
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:3px 10px;
+}
+.card-views{font-size:0.6rem;color:var(--text-dim);}
+.card-dot{font-size:0.4rem;color:var(--text-dim);}
+
+.cat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 22px;margin-bottom:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all 0.2s var(--ease);
+}
+.cat-card:hover{background:var(--surface-hover);border-color:var(--border-hover);transform:translateY(-1px);}
+.cat-name{font-size:0.98rem;font-weight:600;color:var(--text);}
+.cat-arrow{font-size:0.8rem;color:var(--text-dim);}
+
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:9px 16px;margin-bottom:20px;cursor:pointer;
+  font-size:0.72rem;color:var(--text-sec);transition:all 0.2s var(--ease);
+}
+.back-btn:hover{background:var(--surface-hover);border-color:var(--border-hover);color:var(--text);}
+
+.article-wrap{animation:slideUp 0.3s var(--ease);}
+.article-title{font-size:1.65rem;font-weight:800;color:#fff;line-height:1.35;margin-bottom:16px;}
+.article-body{font-size:1rem;line-height:1.95;color:rgba(200,200,220,0.9);}
+.article-body p{margin-bottom:20px;}
+.article-footer{margin-top:32px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
+/* دکمه‌های ناوبری جدید فوتر */
+.footer-clickable-tag {
+  font-size:0.65rem;color:var(--text-sec);background:rgba(124,124,255,0.1);
+  border:1px solid rgba(124,124,255,0.2);border-radius:20px;padding:4px 12px;cursor:pointer;transition:all 0.2s;
+}
+.footer-clickable-tag:hover {
+  background:var(--accent);color:#000;border-color:var(--accent);
+}
+
+/* ── OVERLAY & SHEET ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:200;pointer-events:none;transition:background 0.35s var(--ease);}
+.overlay.open{background:rgba(0,0,8,0.8);backdrop-filter:blur(6px);pointer-events:all;}
+
+.sheet{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);
+  width:100%;max-width:720px;background:rgba(8,8,14,0.9);
+  backdrop-filter:blur(60px);border-top:1px solid var(--border);border-radius:28px 28px 0 0;
+  z-index:201;transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  padding-bottom:20px;
+}
+.sheet.open{transform:translateX(-50%) translateY(0);}
+.sheet-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.1);margin:16px auto 0;}
+.sheet-header{padding:20px 24px 10px;display:flex;align-items:center;gap:10px;}
+.sheet-title{font-size:1rem;font-weight:600;}
+.sheet-menu{padding:10px 16px;display:flex;flex-direction:column;gap:4px;}
+.menu-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;}
+.menu-item:hover{background:var(--surface);}
+.menu-item.active{background:var(--accent-glow);color:var(--accent);}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<div id="app-loading-screen">
+  <div class="loading-text-wrapper">
+    <span class="letter" id="l-b">B</span>
+    <span class="letter" id="l-and">and</span>
+    <span class="letter" id="l-w">W</span>
+  </div>
+</div>
+
+<div class="app">
+  <header class="header">
+    <button class="menu-btn" onclick="toggleSheet()">☰</button>
+    <div class="header-center">
+      <span class="header-name">BandW</span>
+      <span class="header-tag">black & white</span>
+    </div>
+  </header>
+  <main class="content" id="content"></main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">منو دسته‌بندی‌ها</span></div>
+  <nav class="sheet-menu">
+    <div class="menu-item" id="menu-home" onclick="setTab('home')">خانه</div>
+    <div class="menu-item" id="menu-cat" onclick="setTab('category')">دسته‌بندی‌ها</div>
+  </nav>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hngeorydusjxqaceojmj.supabase.co'; 
+const H = { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.abc', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.abc' };
+
+const state = {
+  view: 'list', // list, article, categories, subcategories, subcatposts
+  tab: 'home',
+  posts: [],
+  categories: [],
+  selectedPost: null,
+  selectedCat: null,
+  selectedSubcat: null
+};
+
+const contentEl = document.getElementById('content');
+const esc = t => (t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+async function getPosts() {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/posts?status=eq.published&order=created_at.desc`, { headers: H });
+  return r.json();
+}
+
+function toggleSheet() {
+  document.getElementById('sheet').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function setTab(tab) {
+  state.tab = tab;
+  closeSheet();
+  document.getElementById('menu-home').classList.toggle('active', tab==='home');
+  document.getElementById('menu-cat').classList.toggle('active', tab==='category');
+  
+  if(tab === 'home') {
+    state.view = 'list';
+  } else {
+    state.view = 'categories';
+  }
+  render();
+}
+
+function render() {
+  contentEl.innerHTML = '';
+  if(state.view === 'list') {
+    renderList(state.posts);
+  } else if(state.view === 'categories') {
+    renderCategories();
+  } else if(state.view === 'subcategories') {
+    renderSubcategories();
+  } else if(state.view === 'subcatposts') {
+    renderSubcatPosts();
+  } else if(state.view === 'article') {
+    renderArticle();
+  }
+}
+
+function renderList(postsList) {
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.innerText = 'آخرین مقالات';
+  contentEl.appendChild(label);
+  
+  if(!postsList.length) {
+    contentEl.innerHTML += '<div class="status-card">مقاله‌ای یافت نشد.</div>';
+    return;
+  }
+  postsList.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    const sub = p.subcategory ? ` · ${p.subcategory}` : '';
+    card.innerHTML = `<div class="card-title">${esc(p.title)}</div><div class="card-meta"><span class="card-cat">${esc(p.category)}${esc(sub)}</span></div>`;
+    card.addEventListener('click', () => {
+      state.selectedPost = p;
+      state.view = 'article';
+      render();
+    });
+    contentEl.appendChild(card);
+  });
+}
+
+function renderCategories() {
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.innerText = 'دسته‌بندی‌ها';
+  contentEl.appendChild(label);
+
+  // استخراج یونیک کتگوری‌ها
+  const cats = [...new Set(state.posts.map(p => p.category).filter(Boolean))];
+  if(!cats.length) {
+    contentEl.innerHTML += '<div class="status-card">دسته‌بندی‌ای وجود ندارد.</div>';
+    return;
+  }
+  
+  cats.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = `<span class="cat-name">${esc(c)}</span><span class="cat-arrow">←</span>`;
+    card.addEventListener('click', () => {
+      state.selectedCat = c;
+      state.view = 'subcategories';
+      render();
+    });
+    contentEl.appendChild(card);
+  });
+}
+
+function renderSubcategories() {
+  const btn = document.createElement('button');
+  btn.className = 'back-btn';
+  btn.innerText = 'بازگشت به دسته‌بندی‌ها';
+  btn.onclick = () => { state.view = 'categories'; render(); };
+  contentEl.appendChild(btn);
+
+  const label = document.createElement('div');
+  label.className = 'section-label';
+  label.innerText = `شاخه‌های ${state.selectedCat}`;
+  contentEl.appendChild(label);
+
+  // پیدا کردن زیرشاخه‌های مربوط به این دسته‌بندی اصلی
+  const subcats = [...new Set(state.posts.filter(p => p.category === state.selectedCat).map(p => p.subcategory).filter(Boolean))];
+  
+  if(!subcats.length) {
+    contentEl.innerHTML += '<div class="status-card">زیرشاخه‌ای پیدا نشد.</div>';
+    return;
+  }
+
+  subcats.forEach(sc => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = `<span class="cat-name">${esc(sc)}</span><span class="cat-arrow">←</span>`;
+    card.addEventListener('click', () => {
+      state.selectedSubcat = sc;
+      state.view = 'subcatposts';
+      render();
+    });
+    contentEl.appendChild(card);
+  });
+}
+
+function renderSubcatPosts() {
+  const btn = document.createElement('button');
+  btn.className = 'back-btn';
+  btn.innerText = `بازگشت به شاخه‌ها`;
+  btn.onclick = () => { state.view = 'subcategories'; render(); };
+  contentEl.appendChild(btn);
+
+  const filtered = state.posts.filter(p => p.category === state.selectedCat && p.subcategory === state.selectedSubcat);
+  renderList(filtered);
+}
+
+function renderArticle() {
+  const p = state.selectedPost;
+  const btn = document.createElement('button');
+  btn.className = 'back-btn';
+  btn.innerText = 'بازگشت';
+  btn.onclick = () => { state.view = 'list'; render(); };
+  contentEl.appendChild(btn);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'article-wrap';
+  
+  const bodyHtml = (p.body || '').split('\n').map(l => `<p style="margin-bottom:12px;">${esc(l)}</p>`).join('');
+  
+  wrap.innerHTML = `
+    <h1 class="article-title">${esc(p.title)}</h1>
+    <div class="article-body">${bodyHtml}</div>
+    <div class="article-footer">
+      <span>دسته‌بندی:</span>
+      <span class="footer-clickable-tag" onclick="goToCategoryFromFooter('${esc(p.category)}')">${esc(p.category)}</span>
+      ${p.subcategory ? `<span>شاخه:</span><span class="footer-clickable-tag" onclick="goToSubcatFromFooter('${esc(p.category)}', '${esc(p.subcategory)}')">${esc(p.subcategory)}</span>` : ''}
+    </div>
+  `;
+  contentEl.appendChild(wrap);
+}
+
+function goToCategoryFromFooter(catName) {
+  state.tab = 'category';
+  state.selectedCat = catName;
+  state.view = 'subcategories'; // رفتن به لیست شاخه‌ها
+  render();
+}
+
+function goToSubcatFromFooter(catName, subcatName) {
+  state.tab = 'category';
+  state.selectedCat = catName;
+  state.selectedSubcat = subcatName;
+  state.view = 'subcatposts'; // رفتن به مقالات آن شاخه
+  render();
+}
+
+(async function init(){
+  try { state.posts = await getPosts(); } catch { state.posts = []; }
+  document.getElementById('app-loading-screen').classList.add('loaded');
+  render();
+})();
+</script>
+</body>
+</html>
