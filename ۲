@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل مدیریت — BandW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#050508;--surface:rgba(255,255,255,0.045);--surface2:rgba(255,255,255,0.07);--border:rgba(255,255,255,0.07);--border-hover:rgba(255,255,255,0.2);--text:#f4f4f8;--text-muted:#9999bb;--text-dim:#444458;--accent:#7c7cff;--radius:18px;--radius-sm:10px;--ease:cubic-bezier(0.4,0,0.2,1);--header-h:62px;}
+
+html,body{
+  min-height:100%;background:var(--bg);
+  color:var(--text);font-family:'Vazirmatn','Inter',sans-serif;-webkit-font-smoothing:antialiased;
+}
+
+/* اسکرول بار زیبا برای کامپیوتر */
+body::-webkit-scrollbar { width: 6px; }
+body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+body::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ساختار تمام صفحه دسکتاپ و موبایل */
+.admin-screen{
+  display:block;
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  border-left:1px solid var(--border);
+  border-right:1px solid var(--border);
+}
+
+.header{height:var(--header-h);display:flex;align-items:center;padding:0 20px;background:rgba(6,6,15,0.8);border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);gap:10px;}
+.header-name{font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;color:#fff;}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);background:rgba(6,6,15,0.75);position:sticky;top:var(--header-h);z-index:99;}
+.tab-btn{flex:1;padding:14px 8px;font-family:'Vazirmatn',sans-serif;font-size:0.8rem;background:none;border:none;color:var(--text-dim);cursor:pointer;}
+.tab-btn.active{color:#fff;border-bottom:2px solid #fff;}
+
+.tab-panel{display:none;padding:20px 16px;}
+.tab-panel.active{display:block;}
+
+.post-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:20px;margin-bottom:10px;}
+.post-title{font-size:1rem;font-weight:500;color:#e0e0e0;margin-bottom:6px;}
+.post-meta{font-size:0.7rem;color:var(--text-muted);margin-bottom:12px;}
+
+.action-btn{font-family:'Vazirmatn',sans-serif;font-size:0.7rem;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:none;color:var(--text-muted);cursor:pointer;margin-left:6px;}
+.action-btn:hover{border-color:var(--border-hover);color:#fff;}
+
+/* فرم‌ها */
+.add-cat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px;}
+.cat-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:#fff;outline:none;}
+
+/* مدال‌ها */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:rgba(10,10,22,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:24px;width:100%;max-width:500px;}
+.mfield{margin-bottom:14px;}
+.mlabel{display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;}
+.mselect, .mtextarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;color:#fff;font-family:inherit;}
+.mtextarea{height:120px;resize:vertical;}
+</style>
+</head>
+<body>
+
+<div class="admin-screen">
+  <header class="header">
+    <div class="header-name">BandW — پنل مدیریت تجمیعی</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(0)">مدیریت مقالات</button>
+    <button class="tab-btn" onclick="switchTab(1)">مدیریت دسته‌ها و شاخه‌ها</button>
+  </div>
+
+  <div class="tab-panel active" id="panel-posts">
+    <div id="posts-list">در حال بارگذاری...</div>
+  </div>
+
+  <div class="tab-panel" id="panel-categories-tab">
+    <div class="add-cat-card">
+      <h3 style="font-size:0.9rem;margin-bottom:4px;">افزودن دسته اصلی و زیرشاخه</h3>
+      <input type="text" class="cat-input" id="new-cat-name" placeholder="نام دسته بندی اصلی (مثلا: تکنولوژی)"/>
+      <input type="text" class="cat-input" id="new-subcat-name" placeholder="نام شاخه/زیرشاخه جدید (مثلا: هوش مصنوعی)"/>
+      <button class="action-btn" onclick="addCategoryAndSub()" style="background:#fff;color:#000;padding:10px;">+ ثبت و اضافه کردن</button>
+    </div>
+    <div id="categories-tree-list"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-sheet">
+    <h3 style="margin-bottom:14px;">ویرایش مقاله</h3>
+    <input type="hidden" id="edit-post-id"/>
+    <div class="mfield">
+      <label class="mlabel">عنوان مقاله</label>
+      <input type="text" class="cat-input" id="edit-title"/>
+    </div>
+    <div class="mfield">
+      <label class="mlabel">دسته‌بندی اصلی</label>
+      <input type="text" class="cat-input" id="edit-category"/>
+    </div>
+    <div class="mfield">
+      <label class="mlabel">شاخه / زیرشاخه</label>
+      <input type="text" class="cat-input" id="edit-subcategory"/>
+    </div>
+    <div class="mfield">
+      <label class="mlabel">متن مقاله</label>
+      <textarea class="mtextarea" id="edit-body"></textarea>
+    </div>
+    <button class="action-btn" onclick="savePostEdit()">ذخیره تغییرات</button>
+    <button class="action-btn" onclick="closeEditModal()">انصراف</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://hngeorydusjxqaceojmj.supabase.co';
+const H = {
+  'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.abc',
+  'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZ2VvcnlkdXNqeHFhY2Vvam1qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NDMyMzgsImV4cCI6MjA5NjMxOTIzOH0.abc',
+  'Content-Type': 'application/json'
+};
+
+let allPosts = [];
+
+function switchTab(idx) {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+  panels.forEach((p, i) => p.classList.toggle('active', i === idx));
+  if(idx === 0) loadPosts();
+  if(idx === 1) renderCategoriesTree();
+}
+
+async function loadPosts() {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/posts?order=created_at.desc`, { headers: H });
+  allPosts = await r.json();
+  const listEl = document.getElementById('posts-list');
+  listEl.innerHTML = '';
+  
+  allPosts.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'post-card';
+    card.innerHTML = `
+      <div class="post-title">${esc(p.title)}</div>
+      <div class="post-meta">دسته: ${esc(p.category)} | شاخه: ${esc(p.subcategory || 'بدون شاخه')} [${esc(p.status)}]</div>
+      <button class="action-btn" onclick="openEditModal('${p.id}')">ویرایش دسته و شاخه</button>
+    `;
+    listEl.appendChild(card);
+  });
+}
+
+function openEditModal(id) {
+  const p = allPosts.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('edit-post-id').value = p.id;
+  document.getElementById('edit-title').value = p.title;
+  document.getElementById('edit-category').value = p.category || '';
+  document.getElementById('edit-subcategory').value = p.subcategory || '';
+  document.getElementById('edit-body').value = p.body || '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function savePostEdit() {
+  const id = document.getElementById('edit-post-id').value;
+  const title = document.getElementById('edit-title').value;
+  const category = document.getElementById('edit-category').value;
+  const subcategory = document.getElementById('edit-subcategory').value;
+  const body = document.getElementById('edit-body').value;
+
+  await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: H,
+    body: JSON.stringify({ title, category, subcategory, body })
+  });
+
+  closeEditModal();
+  loadPosts();
+}
+
+function renderCategoriesTree() {
+  const treeEl = document.getElementById('categories-tree-list');
+  treeEl.innerHTML = '<h3 style="margin: 15px 0 10px 0; font-size:0.9rem;">لیست ساختار شاخه‌ها و تغییر سراسری:</h3>';
+  
+  // استخراج ساختار درختی داینامیک از مقالات موجود
+  const categories = [...new Set(allPosts.map(p => p.category).filter(Boolean))];
+  
+  categories.forEach(cat => {
+    const subcats = [...new Set(allPosts.filter(p => p.category === cat).map(p => p.subcategory).filter(Boolean))];
+    const catBox = document.createElement('div');
+    catBox.style.background = 'rgba(255,255,255,0.02)';
+    catBox.style.padding = '12px';
+    catBox.style.marginBottom = '10px';
+    catBox.style.borderRadius = '8px';
+    
+    catBox.innerHTML = `<strong style="color: var(--accent);">${esc(cat)}</strong><div style="margin-right:15px; margin-top:6px;" id="sub-list-${btoa(encodeURIComponent(cat))}"></div>`;
+    treeEl.appendChild(catBox);
+    
+    const subListEl = document.getElementById(`sub-list-${btoa(encodeURIComponent(cat))}`);
+    subcats.forEach(sub => {
+      const subRow = document.createElement('div');
+      subRow.style.display = 'flex';
+      subRow.style.alignItems = 'center';
+      subRow.style.gap = '8px';
+      subRow.style.marginBottom = '4px';
+      subRow.innerHTML = `
+        <span style="font-size:0.85rem;">- ${esc(sub)}</span>
+        <button class="action-btn" style="font-size:0.6rem;padding:2px 6px;" onclick="editSubcatGlobally('${esc(cat)}', '${esc(sub)}')">ویرایش شاخه</button>
+      `;
+      subListEl.appendChild(subRow);
+    });
+  });
+}
+
+async function editSubcatGlobally(oldCat, oldSub) {
+  const newSubName = prompt(`نام جدید برای شاخه "${oldSub}" در دسته "${oldCat}" را وارد کنید:`, oldSub);
+  if(!newSubName || newSubName.trim() === oldSub) return;
+  
+  // اعمال تغییرات در تمام مقالاتی که از این شاخه استفاده کرده‌اند به صورت سراسری
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/posts?category=eq.${encodeURIComponent(oldCat)}&subcategory=eq.${encodeURIComponent(oldSub)}`, {
+    method: 'PATCH',
+    headers: H,
+    body: JSON.stringify({ subcategory: newSubName.trim() })
+  });
+  
+  if(r.ok) {
+    alert('تغییرات با موفقیت روی تمام مقالات این شاخه اعمال شد.');
+    loadPosts();
+    setTimeout(renderCategoriesTree, 500);
+  }
+}
+
+async function addCategoryAndSub() {
+  const cat = document.getElementById('new-cat-name').value.trim();
+  const sub = document.getElementById('new-subcat-name').value.trim();
+  if(!cat || !sub) { alert('لطفاً هم نام دسته و هم نام شاخه را وارد کنید.'); return; }
+  
+  // ایجاد یک پست پیش‌فرض/موقت جهت ثبت ساختار این زیرشاخه جدید در دیتابیس
+  await fetch(`${SUPABASE_URL}/rest/v1/posts`, {
+    method: 'POST',
+    headers: H,
+    body: JSON.stringify({
+      title: `دسته بندی جدید ایجاد شد: ${sub}`,
+      category: cat,
+      subcategory: sub,
+      body: `این یک یادداشت اولیه برای ایجاد شاخه ${sub} است.`,
+      status: 'pending'
+    })
+  });
+  
+  alert('شاخه با موفقیت ثبت شد.');
+  document.getElementById('new-cat-name').value = '';
+  document.getElementById('new-subcat-name').value = '';
+  loadPosts();
+}
+
+function esc(t) { return (t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// لود اولیه
+loadPosts();
+</script>
+</body>
+</html>
