@@ -4,29 +4,38 @@ const KEY = process.env.OPENROUTER_API_KEY;
 const DB_URL = process.env.SUPABASE_URL;
 const DB_KEY = process.env.SUPABASE_KEY;
 
-const today = new Date();
-const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+const TOPICS = [
+  {category:'تکنولوژی', subcategory:'هوش مصنوعی', hint:'هوش مصنوعی و مدل‌های زبانی'},
+  {category:'تکنولوژی', subcategory:'گوشی و تبلت', hint:'گوشی‌های هوشمند و تبلت'},
+  {category:'تکنولوژی', subcategory:'لپ‌تاپ و کامپیوتر', hint:'لپ‌تاپ و تراشه‌های پردازنده'},
+  {category:'تکنولوژی', subcategory:'امنیت سایبری', hint:'امنیت سایبری و هک'},
+  {category:'تکنولوژی', subcategory:'خودروهای برقی', hint:'خودروهای الکتریکی'},
+  {category:'علم', subcategory:'فضا و نجوم', hint:'فضا و اکتشافات نجومی'},
+  {category:'علم', subcategory:'فیزیک و کوانتوم', hint:'فیزیک کوانتومی'},
+];
 
-const prompt = `بازه زمانی فعلی: از تاریخ ${lastWeek.toISOString().split('T')[0]} تا ${today.toISOString().split('T')[0]} (برابر با هفته جاری در سال 2026)
+const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
 
-وظیفه شما:
-۱. از بین این چهار موضوع، یکی را به صورت کاملاً تصادفی انتخاب کن: "تراشه‌های پردازنده"، "هوش مصنوعی"، "خودروهای برقی"، "سیستم‌عامل‌ها".
-۲. با استفاده از ابزار جستجوی خود، اخبار و رویدادهای واقعی بین‌المللی مرتبط با آن موضوع را که دقیقاً در همین بازه زمانی (هفته جاری) رخ داده‌اند، جستجو کن.
-۳. بر اساس یک خبر مشخص، مستند و بسیار جدید یافته‌شده، یک مقاله خبری-تحلیلی به زبان فارسی بنویس.
+const prompt = `تاریخ امروز: ${new Date().toLocaleDateString('fa-IR')}
 
-شرایط سخت‌گیرانه مقاله:
-- تاریخ خبر حتما برای سال 2026 به بعد باشد
+موضوع: ${topic.hint}
+
+یک خبر مشخص و واقعی از این هفته درباره موضوع بالا انتخاب کن و یک مقاله خبری-تحلیلی فارسی بنویس.
+
+شرایط:
+- تاریخ خبر حتماً برای ۲۰۲۶ به بعد باشد
 - زبان فارسی باشد
-- روی یک خبر یا رویداد مشخص تمرکز کن و از کلی‌گویی و اطلاعات قدیمی یا فرضی جداً خودداری کن.
-- لحن جذاب، روان، حرفه‌ای و تحلیل‌گرایانه داشته باشد.
-- دقیقاً ۶ پاراگراف داشته باشد و هر پاراگراف بدون استثنا شامل ۳ تا ۴ جمله باشد.
-- حتماً حاوی جزئیات واقعی، نام دقیق شرکت‌ها، مدل محصول، آمار و ارقام و داده‌های کمی مربوط به خبر این هفته باشد.
+- روی یک رویداد یا محصول مشخص تمرکز کن
+- لحن جذاب و روان
+- دقیقاً ۶ پاراگراف، هر کدام ۳-۴ جمله
+- جزئیات واقعی مثل نام شرکت، مدل، آمار
 
-خروجی را فقط و فقط در قالب ساختار JSON زیر تحویل بده و هیچ متن اضافه، مقدمه، موخره یا علامت \`\`\`json در ابتدا و انتها قرار نده:
-{"title":"عنوان خبری جذاب و تحلیل‌گرایانه","body":"پاراگراف اول\\n\\nپاراگراف دوم\\n\\nپاراگراف سوم\\n\\nپاراگراف چهارم\\n\\nپاراگراف پنجم\\n\\nپاراگراف ششم"}`;
+فقط JSON بده:
+{"title":"عنوان جذاب","body":"پاراگراف اول\n\nپاراگراف دوم\n\nپاراگراف سوم\n\nپاراگراف چهارم\n\nپاراگراف پنجم\n\nپاراگراف ششم"}`;
 
 async function run() {
-  console.log('Calling OpenRouter...');
+  console.log('Topic: ' + topic.category + ' > ' + topic.subcategory);
+
   const r1 = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -36,52 +45,43 @@ async function run() {
       'X-Title': 'BandW Blog'
     },
     body: JSON.stringify({
-      model: 'deepseek/deepseek-chat-v3-0324',
+      model: 'meta-llama/llama-3.3-70b-instruct:free',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 1500
+      max_tokens: 2000
     })
   });
-  
-  if (!r1.ok) { 
-    const e = await r1.text(); 
-    throw new Error('OpenRouter: ' + e); 
-  }
-  
+
+  if (!r1.ok) { const e = await r1.text(); throw new Error('OpenRouter: ' + e); }
+
   const d1 = await r1.json();
   let text = d1.choices[0].message.content.trim();
-  
-  text = text.replace(/```json|```/g, '').trim();
-  
+  text = text.replace(/```json|```/g, '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+
   const post = JSON.parse(text);
   console.log('Generated: ' + post.title);
-  
+
   const r2 = await fetch(DB_URL + '/rest/v1/posts', {
     method: 'POST',
-    headers: { 
-      'apikey': DB_KEY, 
-      'Authorization': 'Bearer ' + DB_KEY, 
-      'Content-Type': 'application/json', 
-      'Prefer': 'return=minimal' 
+    headers: {
+      'apikey': DB_KEY,
+      'Authorization': 'Bearer ' + DB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
     },
-    body: JSON.stringify({ 
-      title: post.title, 
-      body: post.body, 
-      category: 'تکنولوژی', 
-      status: 'published', 
-      is_best: false, 
-      view_count: 0 
+    body: JSON.stringify({
+      title: post.title,
+      body: post.body,
+      category: topic.category,
+      subcategory: topic.subcategory,
+      status: 'published',
+      is_ai: true,
+      is_best: false,
+      view_count: 0
     })
   });
-  
-  if (!r2.ok) { 
-    const e = await r2.text(); 
-    throw new Error('Supabase: ' + e); 
-  }
-  
-  console.log('Published: ' + post.title);
+
+  if (!r2.ok) { const e = await r2.text(); throw new Error('Supabase: ' + e); }
+  console.log('Published: ' + post.title + ' [' + topic.category + ' > ' + topic.subcategory + ']');
 }
 
-run().catch(e => { 
-  console.error(e.message); 
-  process.exit(1); 
-});
+run().catch(e => { console.error(e.message); process.exit(1); });
